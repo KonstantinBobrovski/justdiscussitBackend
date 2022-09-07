@@ -1,8 +1,8 @@
 const bcrypt = require('bcrypt');
-const { Users, UserHobbies } = require('../models/index.js')
+const { Users, UserHobbies, Hobby } = require('../models/index.js')
 const JwtService = require('../services/JWT.service')
 
-const NonSensetiveAtrr = ['username', "country", "language", 'age', 'description', 'time']
+const NonSensetiveAtrr = ['id','username', "country", "language", 'age', 'description', 'time', 'name']
 
 class UserController {
     async Register(req, res) {
@@ -30,7 +30,7 @@ class UserController {
             let access = await JwtService.CreateAccessToken({ user: new_user }, '6h');
             return res.json({
                 access, user: {
-                    ...user, password: ''
+                    ...new_user.dataValues, password: ''
                 }
             })
         } catch (error) {
@@ -88,8 +88,16 @@ class UserController {
             },
             attributes: NonSensetiveAtrr
         })
+        const hobbies = await UserHobbies.findAll({
+            where: {
+                userId: +userId
+            },
+            include: Hobby
+        })
+
         res.json({
-            user
+            user,
+            hobbies
         })
     }
     async ChangeMyFrofile(req, res) {
@@ -99,14 +107,9 @@ class UserController {
                 error: true
             })
 
-        const { country, language, age, time, desc, hobbies } = req.body;
+        const { country, language, age, time, desc, hobbies,name } = req.body;
         console.log(req.user);
-        if (!country || !language) {
-            return res.json({
-                status: 400,
-                error: true
-            })
-        }
+       
         console.log('here0');
         const user = await Users.findOne({
             where: {
@@ -119,13 +122,14 @@ class UserController {
         user.age = age;
         user.time = time;
         user.description = desc;
+        user.name=name;
         console.log('here');
         await user.save()
         console.log('here2');
 
-            //Yep there is potential bug
-            (hobbies || []).forEach(el =>
-                UserHobbies.create({ hoobbyId: el, userId: req.user.id }));
+        //Yep there is potential bug
+        (hobbies || []).forEach(el =>
+            UserHobbies.create({ hoobbyId: el, userId: req.user.id }));
 
         return res.json({
             user: user

@@ -9,6 +9,10 @@ let UserHobbies=require('./user_hobby.js')(sequelize, DataTypes)
 
 Users.belongsToMany(Hobby, { through: UserHobbies });
 Hobby.belongsToMany(Users, { through: UserHobbies });
+UserHobbies.belongsTo(Hobby);
+
+
+
 console.log('Imported sequalize');
 
 module.exports = { sequelize, Users, Hobby,UserHobbies };
