@@ -1,5 +1,5 @@
 module.exports = function (sequelize, DataTypes) {
-    let Message = sequelize.define('Message', {
+    let Chat = sequelize.define('Chat', {
         id: {
             field: 'id',
             type: DataTypes.INTEGER,
@@ -7,16 +7,16 @@ module.exports = function (sequelize, DataTypes) {
             primaryKey: true,
             allowNull: false,
         },
-        receiverId: {
+        userOneId: {
             type: DataTypes.INTEGER,
             allowNull: false,
         },
-        chatId:{
-            field: 'id',
+        userTwoId: {
             type: DataTypes.INTEGER,
             allowNull: false,
         }
+
     });
 
-    return Message;
+    return Chat;
 }

@@ -18,7 +18,7 @@ const Start = async () => {
 
     const io = require('socket.io')(server);
 
-    io.on('connection', require('./controllers/Socket.controller').SocketHandling);
+   // io.on('connection', require('./controllers/Socket.controller').SocketHandling);
 }
 
 Start();
