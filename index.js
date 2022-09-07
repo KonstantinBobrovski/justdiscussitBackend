@@ -5,6 +5,7 @@ const Start = async () => {
     const app = express();
     const { Sync } = require('./models/sequalize');
     await Sync()
+    
     app.use(cors())
 
     app.use(express.urlencoded({ extended: true }));

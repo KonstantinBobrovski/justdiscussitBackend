@@ -1,11 +1,13 @@
 const bcrypt = require('bcrypt');
-const { Users } = require('../models/index.js')
+const { Users, UserHobbies } = require('../models/index.js')
 const JwtService = require('../services/JWT.service')
 
-const NonSensetiveAtrr= ['username', "country", "language",'age','description','time']
+const NonSensetiveAtrr = ['username', "country", "language", 'age', 'description', 'time']
 
 class UserController {
     async Register(req, res) {
+        console.log('Register');
+
         const { body } = req;
         const user = body.user
         if (!user) {
@@ -40,6 +42,8 @@ class UserController {
 
     }
     async Login(req, res, next) {
+        console.log('Login');
+        console.log(req.body);
         const { body } = req;
         let user = await Users.findOne({
             where: {
@@ -47,7 +51,7 @@ class UserController {
             },
 
         });
-        console.log(user);
+        console.log('Login user', user);
         if (!user)
             return res.json({
                 error: true
@@ -63,7 +67,8 @@ class UserController {
             })
         }
         return res.json({
-            error: true
+            error: true,
+            statut: 400
         })
     }
 
@@ -90,10 +95,11 @@ class UserController {
     async ChangeMyFrofile(req, res) {
         if (!req.user)
             return res.json({
-                status: 400,
+                status: 401,
                 error: true
             })
-        const { country, language } = req.body
+
+        const { country, language, age, time, desc, hobbies } = req.body;
         console.log(req.user);
         if (!country || !language) {
             return res.json({
@@ -101,14 +107,28 @@ class UserController {
                 error: true
             })
         }
-        const ress = await Users.update({ country, language }, {
+        console.log('here0');
+        const user = await Users.findOne({
             where: {
-                id: req.user.id
+                id: +req.user.id
             }
         })
+        console.log('here5');
+        user.language = language;
+        user.country = country;
+        user.age = age;
+        user.time = time;
+        user.description = desc;
+        console.log('here');
+        await user.save()
+        console.log('here2');
+
+            //Yep there is potential bug
+            (hobbies || []).forEach(el =>
+                UserHobbies.create({ hoobbyId: el, userId: req.user.id }));
 
         return res.json({
-            user: ress
+            user: user
         })
     }
 
@@ -119,7 +139,7 @@ class UserController {
         res.json({ users })
     }
     async AddHobies(req, res) {
-       
+
     }
 }
 
