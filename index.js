@@ -15,6 +15,10 @@ const Start = async () => {
     const server = app.listen(process.env.PORT ||5000 , () => {
         console.log(`I WORK. Example app listening at http://localhost:5000`)
     });
+
+    const io = require('socket.io')(server);
+
+    io.on('connection', require('./controllers/Socket.controller').SocketHandling);
 }
 
 Start();
